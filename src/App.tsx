@@ -117,6 +117,23 @@ export default function App() {
     setSurahDetail(detail)
   }, [])
 
+  const handleReadProgress = useCallback(
+    (surah: number, ayah: number) => {
+      const meta = surahs.find((item) => item.number === surah)
+      setLastRead((current) =>
+        current?.surah === surah && current.ayah === ayah
+          ? current
+          : {
+              surah,
+              ayah,
+              surahName: meta?.englishName || `Surah ${surah}`,
+              timestamp: Date.now(),
+            },
+      )
+    },
+    [surahs, setLastRead],
+  )
+
   const openSurah = useCallback(
     (number: number, ayah?: number) => {
       setSurahNumber(number)
@@ -287,6 +304,7 @@ export default function App() {
               onPlayAyah={playAyah}
               onTogglePlayback={togglePlayback}
               onOpenSurah={(number) => openSurah(number)}
+              onReadProgress={handleReadProgress}
               onToast={showToast}
               onSettingChange={updateSettings}
               surahs={surahs}

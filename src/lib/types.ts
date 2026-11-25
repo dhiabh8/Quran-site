@@ -61,12 +61,30 @@ export type Theme = 'dark' | 'light'
 
 export type View = 'home' | 'surahs' | 'juz' | 'tasbih' | 'bookmarks' | 'reader'
 
+export type TafsirSourceId = 'ibnkathir' | 'saadi' | 'tabari' | 'muyassar'
+
+export interface TafsirSource {
+  id: TafsirSourceId
+  name: string
+  author: string
+  resourceId: number
+}
+
+export interface TafsirEntry {
+  sourceId: TafsirSourceId
+  surah: number
+  ayah: number
+  sourceName: string
+  text: string
+}
+
 export interface Settings {
   theme: Theme
   arabicFontSize: number
   showTranslation: boolean
   showTransliteration: boolean
   reciter: string
+  tafsirSource: TafsirSourceId
 }
 
 export interface SearchResult {

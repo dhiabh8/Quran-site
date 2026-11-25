@@ -1,6 +1,6 @@
 import { Moon, RotateCcw, Sun, X } from 'lucide-react'
-import { RECITERS } from '../lib/api'
-import type { Settings } from '../lib/types'
+import { RECITERS, TAFSIR_SOURCES } from '../lib/api'
+import type { Settings, TafsirSourceId } from '../lib/types'
 
 interface SettingsDrawerProps {
   open: boolean
@@ -16,6 +16,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showTranslation: true,
   showTransliteration: false,
   reciter: 'ar.alafasy',
+  tafsirSource: 'ibnkathir',
 }
 
 function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (value: boolean) => void; label: string }) {
@@ -80,6 +81,23 @@ export function SettingsDrawer({ open, settings, onChange, onReset, onClose }: S
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="setting-group">
+            <label className="setting-label" htmlFor="tafsir-source">Default tafsir</label>
+            <select
+              id="tafsir-source"
+              className="select-input"
+              value={settings.tafsirSource}
+              onChange={(event) => onChange({ tafsirSource: event.target.value as TafsirSourceId })}
+            >
+              {TAFSIR_SOURCES.map((source) => (
+                <option key={source.id} value={source.id}>
+                  {source.name} · {source.author}
+                </option>
+              ))}
+            </select>
+            <p className="setting-hint">Authentic Arabic tafsir from Quran.com.</p>
           </div>
 
           <div className="setting-group">

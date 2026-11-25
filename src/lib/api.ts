@@ -1,6 +1,16 @@
-import type { Ayah, JuzInfo, SearchResult, SurahDetail, SurahSummary } from './types'
+import type {
+  Ayah,
+  JuzInfo,
+  SearchResult,
+  SurahDetail,
+  SurahSummary,
+  TafsirEntry,
+  TafsirSource,
+  TafsirSourceId,
+} from './types'
 
 const BASE = 'https://api.alquran.cloud/v1'
+const TAFSIR_BASE = 'https://api.quran.com/api/v4'
 
 export const RECITERS = [
   { id: 'ar.alafasy', name: 'Mishary Al-Afasy', native: 'مشاري العفاسي' },
@@ -8,6 +18,13 @@ export const RECITERS = [
   { id: 'ar.husary', name: 'Mahmoud Al-Husary', native: 'محمود خليل الحصري' },
   { id: 'ar.minshawi', name: 'Muhammad Siddiq Al-Minshawi', native: 'محمد صديق المنشاوي' },
 ] as const
+
+export const TAFSIR_SOURCES: TafsirSource[] = [
+  { id: 'ibnkathir', name: 'تفسير ابن كثير', author: 'الحافظ ابن كثير', resourceId: 14 },
+  { id: 'saadi', name: 'تفسير السعدي', author: 'عبد الرحمن السعدي', resourceId: 91 },
+  { id: 'tabari', name: 'تفسير الطبري', author: 'الإمام الطبري', resourceId: 15 },
+  { id: 'muyassar', name: 'التفسير الميسّر', author: 'مجمع الملك فهد لطباعة المصحف', resourceId: 16 },
+]
 
 async function getJson<T>(path: string): Promise<T> {
   const response = await fetch(`${BASE}${path}`)
@@ -130,6 +147,63 @@ export async function searchQuran(query: string): Promise<SearchResult[]> {
   return translationCache
     .filter((result) => result.text.toLowerCase().includes(q))
     .slice(0, 40)
+}
+
+export function tafsirTextToPlain(html: string): string {
+  if (typeof DOMParser !== 'undefined') {
+    const doc = new DOMParser().parseFromString(html, 'text/html')
+    const paragraphs = Array.from(doc.body.querySelectorAll('p'))
+      .map((node) => node.textContent?.trim() || '')
+      .filter(Boolean)
+    const text = paragraphs.length > 0 ? paragraphs.join('\n\n') : doc.body.textContent?.trim() || ''
+    return text.replace(/\n{3,}/g, '\n\n').trim()
+  }
+
+  return html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+interface TafsirApiResponse {
+  tafsir?: {
+    text?: string
+    resource_name?: string
+    verses?: Record<string, { id: number }>
+  }
+}
+
+const tafsirCache = new Map<string, TafsirEntry>()
+
+export async function fetchTafsir(
+  sourceId: TafsirSourceId,
+  surah: number,
+  ayah: number,
+): Promise<TafsirEntry> {
+  const source = TAFSIR_SOURCES.find((item) => item.id === sourceId)
+  if (!source) throw new Error('Unknown tafsir source')
+
+  const key = `${sourceId}:${surah}:${ayah}`
+  const cached = tafsirCache.get(key)
+  if (cached) return cached
+
+  const response = await fetch(`${TAFSIR_BASE}/tafsirs/${source.resourceId}/by_ayah/${surah}:${ayah}`)
+  if (!response.ok) throw new Error(`Unable to load tafsir (${response.status})`)
+
+  const json = (await response.json()) as TafsirApiResponse
+  const text = tafsirTextToPlain(json.tafsir?.text || '')
+  const entry: TafsirEntry = {
+    sourceId,
+    surah,
+    ayah,
+    sourceName: json.tafsir?.resource_name || source.name,
+    text,
+  }
+
+  if (text) tafsirCache.set(key, entry)
+  return entry
 }
 
 export function filterSurahs(surahs: SurahSummary[], query: string): SurahSummary[] {
