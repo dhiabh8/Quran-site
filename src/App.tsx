@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AudioBar } from './components/AudioBar'
 import { Bookmarks } from './components/Bookmarks'
+import { FeelingResults } from './components/FeelingResults'
+import { FeelingsHome } from './components/FeelingsHome'
 import { Home } from './components/Home'
 import { Juz } from './components/Juz'
 import { Reader } from './components/Reader'
@@ -10,9 +12,19 @@ import { Sidebar } from './components/Sidebar'
 import { Surahs } from './components/Surahs'
 import { Tasbih } from './components/Tasbih'
 import { Topbar } from './components/Topbar'
-import { fetchAudioForSurah, fetchSurahs } from './lib/api'
+import { fetchAudioForAyah, fetchAudioForSurah, fetchSurahs } from './lib/api'
 import { applyServiceWorkerUpdate } from './lib/pwa'
-import type { Bookmark, LastRead, Settings, SurahDetail, SurahSummary, View } from './lib/types'
+import type {
+  Bookmark,
+  FeelingId,
+  LastRead,
+  Settings,
+  SurahDetail,
+  SurahSummary,
+  VerseLookup,
+  VerseRef,
+  View,
+} from './lib/types'
 import { useStoredState } from './lib/useStoredState'
 import { useReadingProgress } from './lib/useReadingProgress'
 
@@ -23,6 +35,7 @@ const VIEW_TITLES: Record<View, string> = {
   tasbih: 'Tasbih',
   bookmarks: 'Bookmarks',
   reader: '',
+  feelings: 'How are you feeling?',
 }
 
 export default function App() {
@@ -35,6 +48,7 @@ export default function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [toast, setToast] = useState('')
+  const [feelingId, setFeelingId] = useState<FeelingId | null>(null)
   const [surahDetail, setSurahDetail] = useState<SurahDetail | null>(null)
   const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
   const [updateRegistration, setUpdateRegistration] = useState<ServiceWorkerRegistration | null>(null)
@@ -42,18 +56,22 @@ export default function App() {
   const [settings, setSettings] = useStoredState<Settings>('noor.settings', DEFAULT_SETTINGS)
   const [bookmarks, setBookmarks] = useStoredState<Bookmark[]>('noor.bookmarks', [])
   const [lastRead, setLastRead] = useStoredState<LastRead | null>('noor.lastRead', null)
+  const [recentFeelings, setRecentFeelings] = useStoredState<FeelingId[]>('noor.feelings.recent', [])
   const { state: readingProgressState, record: recordReading, start: startKhatmahPlan, complete: completeKhatmahPlan, abandon: abandonKhatmahPlan, ensureLastPosition } = useReadingProgress()
 
   const audioRef = useRef<HTMLAudioElement>(null)
   const audioSurahRef = useRef<number | null>(null)
   const playingAyahRef = useRef<number | null>(null)
+  const audioRequestRef = useRef(0)
+  const audioFromVerseRef = useRef(false)
   const [audioSurah, setAudioSurah] = useState<number | null>(null)
+  const [audioFromVerse, setAudioFromVerse] = useState(false)
   const [playingAyah, setPlayingAyah] = useState<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
 
-  const showToast = (message: string) => setToast(message)
+  const showToast = useCallback((message: string) => setToast(message), [])
 
   useEffect(() => {
     if (lastRead) {
@@ -190,6 +208,44 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
+  const openFeeling = useCallback(
+    (id: FeelingId) => {
+      setFeelingId(id)
+      setRecentFeelings((current) => [id, ...current.filter((item) => item !== id)].slice(0, 6))
+      setView('feelings')
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    },
+    [setRecentFeelings],
+  )
+
+  const chooseAnotherFeeling = () => {
+    setView('home')
+    window.setTimeout(() => {
+      document.getElementById('feelings-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 60)
+  }
+
+  const saveFeelingCollection = (items: VerseLookup[]) => {
+    const additions: Bookmark[] = items
+      .filter((verse) => !bookmarks.some((item) => item.key === `${verse.surah}:${verse.ayah}`))
+      .map((verse) => ({
+        key: `${verse.surah}:${verse.ayah}`,
+        surah: verse.surah,
+        ayah: verse.ayah,
+        surahName: verse.surahName,
+        arabic: verse.arabic,
+        translation: verse.translation,
+        createdAt: Date.now(),
+      }))
+
+    if (additions.length === 0) {
+      showToast('All these verses are already saved')
+      return
+    }
+    setBookmarks((current) => [...additions.filter((item) => !current.some((saved) => saved.key === item.key)), ...current])
+    showToast(`${additions.length} verse${additions.length === 1 ? '' : 's'} saved to bookmarks`)
+  }
+
   const updateSettings = (patch: Partial<Settings>) => setSettings((current) => ({ ...current, ...patch }))
 
   const toggleBookmark = (bookmark: Omit<Bookmark, 'key' | 'createdAt'>) => {
@@ -222,6 +278,8 @@ export default function App() {
 
       audioSurahRef.current = detail.number
       playingAyahRef.current = number
+      audioFromVerseRef.current = false
+      setAudioFromVerse(false)
       setAudioSurah(detail.number)
       setPlayingAyah(number)
       audio.src = ayah.audio
@@ -233,11 +291,50 @@ export default function App() {
     [surahDetail],
   )
 
+  // Plays a verse from the Feelings collection using the same audio element,
+  // reciter setting and AudioBar as the reader.
+  const playVerse = useCallback(
+    (ref: VerseRef) => {
+      const audio = audioRef.current
+      if (!audio) return
+
+      if (audioSurahRef.current === ref.surah && playingAyahRef.current === ref.ayah) {
+        if (audio.paused) void audio.play().catch(() => setIsPlaying(false))
+        else audio.pause()
+        return
+      }
+
+      const request = ++audioRequestRef.current
+      fetchAudioForAyah(ref, settings.reciter)
+        .then((url) => {
+          if (request !== audioRequestRef.current || !audioRef.current) return
+          const element = audioRef.current
+          audioSurahRef.current = ref.surah
+          playingAyahRef.current = ref.ayah
+          audioFromVerseRef.current = true
+          setAudioFromVerse(true)
+          setAudioSurah(ref.surah)
+          setPlayingAyah(ref.ayah)
+          element.src = url
+          element.currentTime = 0
+          setCurrentTime(0)
+          setDuration(0)
+          void element.play().catch(() => setIsPlaying(false))
+        })
+        .catch(() => {
+          if (request === audioRequestRef.current) showToast('Audio is unavailable for this verse')
+        })
+    },
+    [settings.reciter, showToast],
+  )
+
   const stopAudio = () => {
     audioRef.current?.pause()
     if (audioRef.current) audioRef.current.src = ''
     audioSurahRef.current = null
     playingAyahRef.current = null
+    audioFromVerseRef.current = false
+    setAudioFromVerse(false)
     setAudioSurah(null)
     setPlayingAyah(null)
     setIsPlaying(false)
@@ -246,6 +343,7 @@ export default function App() {
   }
 
   const skipAyah = (delta: number) => {
+    if (audioFromVerseRef.current) return
     if (playingAyah === null || !surahDetail || surahDetail.number !== audioSurah) return
     const next = playingAyah + delta
     if (next < 1 || next > surahDetail.numberOfAyahs) return
@@ -253,6 +351,10 @@ export default function App() {
   }
 
   const handleAudioEnded = () => {
+    if (audioFromVerseRef.current) {
+      stopAudio()
+      return
+    }
     if (playingAyahRef.current !== null) skipAyah(1)
     if (playingAyahRef.current === surahDetail?.numberOfAyahs) {
       stopAudio()
@@ -285,7 +387,8 @@ export default function App() {
         <Topbar
           view={view}
           title={VIEW_TITLES[view]}
-          onBack={() => navigate('surahs')}
+          onBack={() => navigate(view === 'feelings' ? 'home' : 'surahs')}
+          backLabel={view === 'feelings' ? 'Home' : undefined}
           onSearch={() => setSearchOpen(true)}
           onSettings={() => setSettingsOpen(true)}
           onMenu={() => setSidebarOpen(true)}
@@ -320,6 +423,7 @@ export default function App() {
                 abandonKhatmahPlan()
                 showToast('Khatmah plan reset')
               }}
+              feelings={<FeelingsHome onSelect={openFeeling} recent={recentFeelings} />}
             />
           )}
           {view === 'surahs' && (
@@ -342,6 +446,24 @@ export default function App() {
               bookmarks={bookmarks}
               onOpen={(surah, ayah) => openSurah(surah, ayah)}
               onRemove={(key) => setBookmarks((current) => current.filter((item) => item.key !== key))}
+            />
+          )}
+          {view === 'feelings' && feelingId && (
+            <FeelingResults
+              feelingId={feelingId}
+              settings={settings}
+              bookmarks={bookmarks}
+              isOnline={isOnline}
+              playing={audioSurah !== null && playingAyah !== null ? { surah: audioSurah, ayah: playingAyah } : null}
+              isPlaying={isPlaying}
+              onChooseAnother={chooseAnotherFeeling}
+              onBackHome={() => navigate('home')}
+              onReadInContext={openSurah}
+              onPlayVerse={playVerse}
+              onToggleBookmark={toggleBookmark}
+              onSaveCollection={saveFeelingCollection}
+              onSettingChange={updateSettings}
+              onToast={showToast}
             />
           )}
           {view === 'reader' && (
@@ -406,8 +528,8 @@ export default function App() {
           currentTime={currentTime}
           duration={duration}
           reciter={settings.reciter}
-          hasPrevious={playingAyah > 1}
-          hasNext={playingAyah < (surahDetail?.number === audioSurah ? surahDetail.numberOfAyahs : 0)}
+          hasPrevious={!audioFromVerse && playingAyah > 1}
+          hasNext={!audioFromVerse && playingAyah < (surahDetail?.number === audioSurah ? surahDetail.numberOfAyahs : 0)}
           onToggle={() => {
             const audio = audioRef.current
             if (!audio) return

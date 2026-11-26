@@ -7,6 +7,8 @@ import type {
   TafsirEntry,
   TafsirSource,
   TafsirSourceId,
+  VerseLookup,
+  VerseRef,
 } from './types'
 
 const BASE = 'https://api.alquran.cloud/v1'
@@ -91,6 +93,59 @@ export async function fetchSurah(number: number, reciter: string): Promise<Surah
 export async function fetchAudioForSurah(number: number, reciter: string): Promise<string[]> {
   const data = await getJson<ApiEdition>(`/surah/${number}/${reciter}`)
   return data.ayahs.map((ayah) => ayah.audio || '')
+}
+
+interface AyahEdition {
+  number: number
+  text: string
+  surah: { number: number; name: string; englishName: string }
+}
+
+const verseCache = new Map<string, VerseLookup>()
+
+/**
+ * Fetches verified Arabic (Uthmani) and Saheeh International translation for
+ * curated references. Text always comes from the API — never from local data.
+ */
+export async function fetchVerses(refs: VerseRef[]): Promise<VerseLookup[]> {
+  const unique = new Map<string, VerseRef>()
+  for (const ref of refs) unique.set(`${ref.surah}:${ref.ayah}`, ref)
+
+  await Promise.all(
+    Array.from(unique.values()).map(async (ref) => {
+      const key = `${ref.surah}:${ref.ayah}`
+      if (verseCache.has(key)) return
+
+      const data = await getJson<AyahEdition[]>(
+        `/ayah/${ref.surah}:${ref.ayah}/editions/quran-uthmani,en.sahih`,
+      )
+      const [arabic, translation] = data
+      if (!arabic || !translation || !arabic.text?.trim() || !translation.text?.trim()) {
+        throw new Error(`No verified text for ${key}`)
+      }
+
+      verseCache.set(key, {
+        surah: ref.surah,
+        ayah: ref.ayah,
+        number: arabic.number,
+        arabic: arabic.text.replace(/^\uFEFF/, '').trim(),
+        translation: translation.text.trim(),
+        surahName: arabic.surah.englishName,
+        surahNameArabic: arabic.surah.name.replace(/^سُورَةُ\s*/, '').trim(),
+      })
+    }),
+  )
+
+  return refs
+    .map((ref) => verseCache.get(`${ref.surah}:${ref.ayah}`))
+    .filter((verse): verse is VerseLookup => Boolean(verse))
+}
+
+/** Audio URL for a single verse, using the same reciter editions as the reader. */
+export async function fetchAudioForAyah(ref: VerseRef, reciter: string): Promise<string> {
+  const data = await getJson<{ audio?: string }>(`/ayah/${ref.surah}:${ref.ayah}/${reciter}`)
+  if (!data.audio) throw new Error('Audio is unavailable for this verse')
+  return data.audio
 }
 
 interface JuzApiResponse {

@@ -1,4 +1,5 @@
 import { ArrowRight, BookOpen, Bookmark, CircleDot, Layers3, Play, Sparkles } from 'lucide-react'
+import type { ReactNode } from 'react'
 import type { LastRead, SurahSummary, View } from '../lib/types'
 import type { ReadingProgressState } from '../lib/readingProgress'
 import { InstallAppCard } from './InstallAppCard'
@@ -18,6 +19,7 @@ interface HomeProps {
   onStartKhatmah: (targetDays: number) => void
   onCompleteKhatmah: () => void
   onAbandonKhatmah: () => void
+  feelings?: ReactNode
 }
 
 const FEATURED = [1, 2, 36, 55, 67, 112]
@@ -34,6 +36,7 @@ export function Home({
   onStartKhatmah,
   onCompleteKhatmah,
   onAbandonKhatmah,
+  feelings,
 }: HomeProps) {
   const featured = FEATURED.map((n) => surahs.find((s) => s.number === n)).filter(
     (s): s is SurahSummary => Boolean(s),
@@ -87,6 +90,8 @@ export function Home({
           </div>
         </div>
       </section>
+
+      {feelings}
 
       <PrayerTimesCard />
 

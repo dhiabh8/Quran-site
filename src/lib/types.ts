@@ -59,7 +59,52 @@ export interface LastRead {
 
 export type Theme = 'dark' | 'light'
 
-export type View = 'home' | 'surahs' | 'juz' | 'tasbih' | 'bookmarks' | 'reader'
+export type FeelingId =
+  | 'sad'
+  | 'anxious'
+  | 'grateful'
+  | 'lost'
+  | 'hopeful'
+  | 'peace'
+  | 'afraid'
+  | 'lonely'
+  | 'overwhelmed'
+  | 'repentant'
+
+export interface FeelingInfo {
+  id: FeelingId
+  label: string
+  arabic: string
+  description: string
+  descriptionAr: string
+  intro: string
+  introAr: string
+}
+
+export interface FeelingPassageContent {
+  refs: VerseRef[]
+  theme: string
+  themeAr: string
+  note: string
+  noteAr: string
+}
+
+export type View = 'home' | 'surahs' | 'juz' | 'tasbih' | 'bookmarks' | 'reader' | 'feelings'
+
+/** A verified Qur'anic reference: surah number (1-114) and ayah within it. */
+export interface VerseRef {
+  surah: number
+  ayah: number
+}
+
+/** Arabic and translation fetched from api.alquran.cloud for a VerseRef. */
+export interface VerseLookup extends VerseRef {
+  number: number
+  arabic: string
+  translation: string
+  surahName: string
+  surahNameArabic: string
+}
 
 export type TafsirSourceId = 'ibnkathir' | 'saadi' | 'tabari' | 'muyassar'
 

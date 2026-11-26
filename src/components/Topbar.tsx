@@ -8,9 +8,10 @@ interface TopbarProps {
   onSearch: () => void
   onSettings: () => void
   onMenu: () => void
+  backLabel?: string
 }
 
-export function Topbar({ view, title, onBack, onSearch, onSettings, onMenu }: TopbarProps) {
+export function Topbar({ view, title, onBack, onSearch, onSettings, onMenu, backLabel }: TopbarProps) {
   return (
     <header className="topbar">
       <div className="topbar-left">
@@ -20,7 +21,7 @@ export function Topbar({ view, title, onBack, onSearch, onSettings, onMenu }: To
         {view === 'reader' ? (
           <button className="back-button" onClick={onBack}>
             <ChevronLeft size={18} />
-            <span>All Surahs</span>
+            <span>{backLabel ?? 'All Surahs'}</span>
           </button>
         ) : (
           <div className="topbar-title">{title}</div>

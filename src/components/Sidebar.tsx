@@ -40,7 +40,10 @@ export function Sidebar({ view, onNavigate, lastRead, onContinue, open, onClose 
           <p className="nav-label">MENU</p>
           {NAV_ITEMS.map((item) => {
             const Icon = item.icon
-            const active = view === item.id || (view === 'reader' && item.id === 'surahs')
+            const active =
+              view === item.id ||
+              (view === 'reader' && item.id === 'surahs') ||
+              (view === 'feelings' && item.id === 'home')
             return (
               <button
                 key={item.id}

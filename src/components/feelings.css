@@ -1,0 +1,474 @@
+/* Quran by Feelings — premium editorial styling aligned with the NOOR theme. */
+
+.feelings-section {
+  margin-top: 52px;
+  padding: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 24px;
+  background:
+    radial-gradient(620px 260px at 100% 0%, var(--accent-soft), transparent 70%),
+    var(--surface);
+  box-shadow: var(--shadow);
+  animation: feelingsIn 0.45s ease both;
+}
+
+.feelings-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 28px;
+}
+
+.feelings-intro h2 {
+  margin: 9px 0 2px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.feelings-intro-ar {
+  margin: 0;
+  font-family: 'Tajawal', 'Amiri Quran', serif;
+  font-size: 20px;
+  color: var(--gold);
+}
+
+.feelings-intro-ar--small {
+  font-size: 14px;
+  color: var(--text-soft);
+}
+
+.feelings-intro-subtitle {
+  margin: 12px 0 4px;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.feelings-intro-note {
+  max-width: 300px;
+  margin: 0;
+  padding-inline-start: 16px;
+  border-inline-start: 2px solid var(--border-strong);
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+.feelings-recent {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.feelings-recent-chip {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 11px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.feelings-recent-chip:hover,
+.feelings-recent-chip:focus-visible {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.feelings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.feeling-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 96px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-solid);
+  text-align: start;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+}
+
+.feeling-card:hover,
+.feeling-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--gold);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+}
+
+.feeling-card-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--gold);
+}
+
+[ data-theme='light' ] .feeling-card-icon {
+  color: var(--accent);
+}
+
+.feeling-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.feeling-card-text strong {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.feeling-card-arabic {
+  font-family: 'Tajawal', 'Amiri Quran', serif;
+  font-size: 14px;
+  color: var(--gold);
+}
+
+[ data-theme='light' ] .feeling-card-arabic {
+  color: var(--secondary);
+}
+
+.feeling-card-text small {
+  color: var(--text-muted);
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.feeling-card-arrow {
+  margin-inline-start: auto;
+  flex: none;
+  color: var(--text-muted);
+  transition: transform 0.22s ease, color 0.22s ease;
+}
+
+.feeling-card:hover .feeling-card-arrow {
+  transform: translateX(-4px);
+  color: var(--gold);
+}
+
+/* ---------- Results page ---------- */
+
+.feelings-results {
+  animation: feelingsIn 0.35s ease both;
+}
+
+.feelings-results-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.feelings-results-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 30px;
+  border: 1px solid var(--border-strong);
+  border-radius: 22px;
+  background:
+    radial-gradient(560px 240px at 100% 0%, var(--accent-soft), transparent 70%),
+    var(--surface);
+}
+
+.feelings-results-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  background: var(--accent-soft);
+  color: var(--gold);
+}
+
+[ data-theme='light' ] .feelings-results-icon {
+  color: var(--accent);
+}
+
+.feelings-results-header h1 {
+  margin: 8px 0 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4vw, 46px);
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.feelings-results-arabic {
+  margin: 2px 0 14px;
+  font-family: 'Tajawal', 'Amiri Quran', serif;
+  font-size: 19px;
+  color: var(--gold);
+}
+
+[ data-theme='light' ] .feelings-results-arabic {
+  color: var(--secondary);
+}
+
+.feelings-results-intro,
+.feelings-results-intro-ar {
+  max-width: 760px;
+  margin: 6px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.85;
+}
+
+.feelings-results-intro-ar {
+  font-family: 'Tajawal', serif;
+  font-size: 15px;
+}
+
+.feelings-notice,
+.feelings-disclaimer {
+  margin-top: 18px;
+  padding: 14px 18px;
+  border: 1px solid var(--border-strong);
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--text-soft);
+  font-size: 11.5px;
+  line-height: 1.8;
+}
+
+.feelings-notice {
+  border-color: var(--border);
+  background: transparent;
+}
+
+.feelings-disclaimer p {
+  margin: 0;
+}
+
+.feelings-disclaimer p + p {
+  margin-top: 6px;
+  font-family: 'Tajawal', serif;
+  font-size: 13px;
+}
+
+.feelings-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 220px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.feelings-source-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 22px 0;
+  color: var(--text-muted);
+  font-size: 10.5px;
+}
+
+.feeling-passage {
+  margin-top: 30px;
+  padding: 26px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+}
+
+.feeling-passage-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.feeling-passage-index {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--gold);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+}
+
+.feeling-passage-head h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.feeling-passage-head p {
+  margin: 2px 0 0;
+  font-family: 'Tajawal', serif;
+  font-size: 14px;
+  color: var(--gold);
+}
+
+.feeling-passage-note,
+.feeling-passage-note-ar {
+  max-width: 820px;
+  margin: 16px 0 0;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  line-height: 1.85;
+}
+
+.feeling-passage-note-ar {
+  font-family: 'Tajawal', serif;
+  font-size: 14px;
+}
+
+.feeling-passage-verses {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.feeling-verse {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface-solid);
+  animation: contextIn 0.25s ease both;
+}
+
+.feeling-verse-ref {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.feeling-verse-ref-name {
+  font-family: 'Tajawal', serif;
+  font-size: 17px;
+  color: var(--gold);
+}
+
+.feeling-verse-ref-en {
+  color: var(--text-muted);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+}
+
+.feeling-verse-arabic {
+  margin: 0;
+  font-family: 'Amiri Quran', serif;
+  line-height: 2.2;
+  color: var(--text);
+}
+
+.feeling-verse-translation {
+  margin: 14px 0 0;
+  padding-inline-start: 14px;
+  border-inline-start: 2px solid var(--border-strong);
+  color: var(--text-soft);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.feeling-verse-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.feeling-verse-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.feeling-verse-actions button:hover,
+.feeling-verse-actions button:focus-visible,
+.feeling-verse-actions .feeling-action-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.feeling-verse .tafsir-panel {
+  margin-top: 18px;
+}
+
+.feelings-results-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 34px;
+}
+
+.feelings-audio-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  color: var(--text-muted);
+  font-size: 10.5px;
+}
+
+@keyframes feelingsIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .feelings-intro { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .feelings-intro-note { max-width: none; }
+}
+
+@media (max-width: 640px) {
+  .feelings-section { margin-top: 30px; padding: 18px; border-radius: 18px; }
+  .feelings-intro { margin-bottom: 20px; }
+  .feelings-intro h2 { font-size: 27px; }
+  .feelings-grid { grid-template-columns: 1fr; }
+  .feeling-card { min-height: 84px; padding: 12px; }
+  .feelings-results-top { flex-direction: column; gap: 8px; }
+  .feelings-results-header { padding: 20px; gap: 14px; }
+  .feelings-results-icon { width: 44px; height: 44px; }
+  .feeling-passage { padding: 16px; border-radius: 16px; }
+  .feeling-verse { padding: 16px; }
+  .feeling-verse-actions button { flex: 1 1 calc(50% - 7px); justify-content: center; }
+  .feelings-results-footer .primary-button,
+  .feelings-results-footer .ghost-button { flex: 1 1 100%; }
+}
