@@ -1,5 +1,6 @@
 import { ArrowRight, BookOpen, Bookmark, CircleDot, Layers3, Play, Sparkles } from 'lucide-react'
 import type { LastRead, SurahSummary, View } from '../lib/types'
+import { PrayerTimesCard } from './PrayerTimesCard'
 import { SurahCard } from './SurahCard'
 
 interface HomeProps {
@@ -73,6 +74,8 @@ export function Home({
           </div>
         </div>
       </section>
+
+      <PrayerTimesCard />
 
       <div className="quick-grid">
         <button className="quick-card" onClick={() => onOpenSurah(lastRead?.surah || 1)}>
