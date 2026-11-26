@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#123c32" />
+    <title>نور — غير متصل</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px;
+        font-family: "Tajawal", "Plus Jakarta Sans", system-ui, sans-serif;
+        background: radial-gradient(900px 480px at 88% -8%, rgba(45,160,120,.13), transparent 62%), #0c1713;
+        color: #f5f2e9;
+      }
+      .card {
+        width: min(560px, 100%); padding: 32px 28px; border-radius: 24px; text-align: center;
+        background: rgba(20,37,30,.92); border: 1px solid rgba(212,175,102,.26);
+        box-shadow: 0 20px 60px rgba(0,0,0,.34);
+      }
+      .mark {
+        width: 72px; height: 72px; margin: 0 auto 18px; border-radius: 20px; display: grid; place-items: center;
+        background: linear-gradient(140deg, #56e6ab, #0b7d5c); color: #05251a; font-size: 42px; font-family: serif;
+      }
+      h1 { margin: 0 0 10px; font-size: 30px; letter-spacing: -0.5px; }
+      p { margin: 0; color: #a6b5aa; line-height: 1.8; font-size: 15px; }
+      .note {
+        margin-top: 18px; padding: 14px 16px; border-radius: 14px; text-align: right;
+        background: rgba(212,175,102,.08); border: 1px solid rgba(212,175,102,.2); color: #e8d5a8; font-size: 13px;
+      }
+      .actions { display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap; }
+      a, button {
+        appearance: none; border: 0; cursor: pointer; text-decoration: none; font: inherit; font-weight: 700;
+        padding: 12px 18px; border-radius: 12px;
+      }
+      .primary { background: linear-gradient(135deg,#56e6ab,#169c73); color: #05251a; }
+      .ghost { background: transparent; color: #f5f2e9; border: 1px solid rgba(166,181,170,.2); }
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <div class="mark" aria-hidden="true">ن</div>
+      <h1>أنت غير متصل بالإنترنت</h1>
+      <p>تطبيق نور يحتاج إلى اتصال لتحميل المحتوى الجديد. يمكنك المحاولة مرة أخرى، أو العودة إلى الصفحات والموارد التي تم حفظها مسبقاً على جهازك.</p>
+      <div class="note">لن تعمل التلاوة الصوتية المباشرة، أو مصادر التفسير البعيدة، أو المزامنة أثناء عدم الاتصال. المحتوى الذي تم تنزيله أو حفظه مسبقاً فقط قد يكون متاحاً.</div>
+      <div class="actions">
+        <button class="primary" onclick="location.reload()">إعادة المحاولة</button>
+        <a class="ghost" href="/">العودة للرئيسية</a>
+      </div>
+    </main>
+  </body>
+</html>

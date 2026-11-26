@@ -1,5 +1,6 @@
 import { ArrowRight, BookOpen, Bookmark, CircleDot, Layers3, Play, Sparkles } from 'lucide-react'
 import type { LastRead, SurahSummary, View } from '../lib/types'
+import { InstallAppCard } from './InstallAppCard'
 import { PrayerTimesCard } from './PrayerTimesCard'
 import { SurahCard } from './SurahCard'
 
@@ -10,6 +11,7 @@ interface HomeProps {
   bookmarksCount: number
   onOpenSurah: (number: number, ayah?: number) => void
   onNavigate: (view: View) => void
+  onToast: (message: string) => void
 }
 
 const FEATURED = [1, 2, 36, 55, 67, 112]
@@ -21,6 +23,7 @@ export function Home({
   bookmarksCount,
   onOpenSurah,
   onNavigate,
+  onToast,
 }: HomeProps) {
   const featured = FEATURED.map((n) => surahs.find((s) => s.number === n)).filter(
     (s): s is SurahSummary => Boolean(s),
@@ -76,6 +79,8 @@ export function Home({
       </section>
 
       <PrayerTimesCard />
+
+      <InstallAppCard onToast={onToast} />
 
       <div className="quick-grid">
         <button className="quick-card" onClick={() => onOpenSurah(lastRead?.surah || 1)}>

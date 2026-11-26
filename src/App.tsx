@@ -11,6 +11,7 @@ import { Surahs } from './components/Surahs'
 import { Tasbih } from './components/Tasbih'
 import { Topbar } from './components/Topbar'
 import { fetchAudioForSurah, fetchSurahs } from './lib/api'
+import { applyServiceWorkerUpdate } from './lib/pwa'
 import type { Bookmark, LastRead, Settings, SurahDetail, SurahSummary, View } from './lib/types'
 import { useStoredState } from './lib/useStoredState'
 
@@ -34,6 +35,8 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [toast, setToast] = useState('')
   const [surahDetail, setSurahDetail] = useState<SurahDetail | null>(null)
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator === 'undefined' ? true : navigator.onLine))
+  const [updateRegistration, setUpdateRegistration] = useState<ServiceWorkerRegistration | null>(null)
 
   const [settings, setSettings] = useStoredState<Settings>('noor.settings', DEFAULT_SETTINGS)
   const [bookmarks, setBookmarks] = useStoredState<Bookmark[]>('noor.bookmarks', [])
@@ -69,7 +72,25 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.theme = settings.theme
+    const meta = document.querySelector('meta[name="theme-color"]')
+    if (meta) meta.setAttribute('content', settings.theme === 'dark' ? '#123c32' : '#f7f5ef')
   }, [settings.theme])
+
+  useEffect(() => {
+    const updateOnline = () => setIsOnline(navigator.onLine)
+    const handleSwUpdate = (event: Event) => {
+      const detail = (event as CustomEvent<ServiceWorkerRegistration>).detail
+      if (detail) setUpdateRegistration(detail)
+    }
+    window.addEventListener('online', updateOnline)
+    window.addEventListener('offline', updateOnline)
+    window.addEventListener('noor:sw-update', handleSwUpdate as EventListener)
+    return () => {
+      window.removeEventListener('online', updateOnline)
+      window.removeEventListener('offline', updateOnline)
+      window.removeEventListener('noor:sw-update', handleSwUpdate as EventListener)
+    }
+  }, [])
 
   useEffect(() => {
     if (!toast) return
@@ -259,6 +280,11 @@ export default function App() {
         />
 
         <main className="main-content">
+          {!isOnline && (
+            <div className="offline-banner" role="status" aria-live="polite">
+              أنت غير متصل بالإنترنت. يمكنك متابعة استخدام الموارد المحفوظة مسبقاً، بينما قد لا تعمل التلاوة المباشرة أو مصادر التفسير البعيدة أو المزامنة.
+            </div>
+          )}
           {view === 'home' && (
             <Home
               surahs={surahs}
@@ -267,6 +293,7 @@ export default function App() {
               bookmarksCount={bookmarks.length}
               onOpenSurah={(number, ayah) => openSurah(number, ayah)}
               onNavigate={navigate}
+              onToast={showToast}
             />
           )}
           {view === 'surahs' && (
@@ -332,7 +359,18 @@ export default function App() {
         onChange={updateSettings}
         onReset={() => setSettings(DEFAULT_SETTINGS)}
         onClose={() => setSettingsOpen(false)}
+        onToast={showToast}
       />
+
+      {updateRegistration && (
+        <div className="update-banner" role="status" aria-live="polite">
+          <span>يتوفر تحديث جديد لتطبيق نور.</span>
+          <div className="update-banner-actions">
+            <button className="update-banner-primary" onClick={() => applyServiceWorkerUpdate(updateRegistration)}>تحديث الآن</button>
+            <button className="update-banner-secondary" onClick={() => setUpdateRegistration(null)}>لاحقاً</button>
+          </div>
+        </div>
+      )}
 
       {audioSurah !== null && playingAyah !== null && (
         <AudioBar

@@ -779,6 +779,143 @@ button:disabled {
   text-align: center;
 }
 
+/* ---------- PWA install / offline / update ---------- */
+.install-card {
+  margin-top: 18px;
+  display: flex;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--border-strong);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(20, 49, 39, 0.82), rgba(13, 31, 25, 0.82));
+}
+
+:root[data-theme='light'] .install-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(241, 247, 243, 0.96));
+}
+
+.install-card--compact {
+  margin-top: 12px;
+  padding: 16px;
+}
+
+.install-card--installed {
+  align-items: center;
+}
+
+.install-card-icon {
+  width: 42px;
+  height: 42px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(212, 175, 102, 0.14);
+  color: var(--gold);
+}
+
+.install-card-body { flex: 1; }
+.install-card strong {
+  display: block;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.install-card p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--text-soft);
+}
+
+.install-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #56e6ab, #169c73);
+  color: #05251a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.install-ios-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  margin-top: 14px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.install-ios-note span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.install-ios-note b { color: var(--gold); }
+
+.offline-banner,
+.update-banner {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.offline-banner {
+  border: 1px solid rgba(212, 175, 102, 0.28);
+  background: rgba(212, 175, 102, 0.1);
+  color: var(--text);
+}
+
+.update-banner {
+  position: fixed;
+  left: calc(262px + 20px);
+  right: 20px;
+  bottom: 20px;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+}
+
+.update-banner-actions { display: flex; gap: 8px; }
+.update-banner-primary,
+.update-banner-secondary {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.update-banner-primary {
+  border: 0;
+  background: var(--gold);
+  color: #123c32;
+}
+
+.update-banner-secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-soft);
+}
+
+@media (max-width: 900px) {
+  .update-banner { left: 20px; }
+}
+
 /* ---------- Quick cards & sections ---------- */
 .quick-grid {
   display: grid;

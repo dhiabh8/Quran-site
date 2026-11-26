@@ -1,6 +1,7 @@
 import { Moon, RotateCcw, Sun, X } from 'lucide-react'
 import { RECITERS, TAFSIR_SOURCES } from '../lib/api'
 import type { Settings, TafsirSourceId } from '../lib/types'
+import { InstallAppCard } from './InstallAppCard'
 
 interface SettingsDrawerProps {
   open: boolean
@@ -8,6 +9,7 @@ interface SettingsDrawerProps {
   onChange: (patch: Partial<Settings>) => void
   onReset: () => void
   onClose: () => void
+  onToast: (message: string) => void
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -33,7 +35,7 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (val
   )
 }
 
-export function SettingsDrawer({ open, settings, onChange, onReset, onClose }: SettingsDrawerProps) {
+export function SettingsDrawer({ open, settings, onChange, onReset, onClose, onToast }: SettingsDrawerProps) {
   return (
     <>
       {open && <button className="drawer-scrim" onClick={onClose} aria-label="Close settings" />}
@@ -49,6 +51,10 @@ export function SettingsDrawer({ open, settings, onChange, onReset, onClose }: S
         </div>
 
         <div className="settings-body">
+          <div className="setting-group">
+            <label className="setting-label">التطبيق</label>
+            <InstallAppCard onToast={onToast} compact />
+          </div>
           <div className="setting-group">
             <label className="setting-label">Appearance</label>
             <div className="theme-switch">
