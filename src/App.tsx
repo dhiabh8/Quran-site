@@ -14,6 +14,7 @@ import { fetchAudioForSurah, fetchSurahs } from './lib/api'
 import { applyServiceWorkerUpdate } from './lib/pwa'
 import type { Bookmark, LastRead, Settings, SurahDetail, SurahSummary, View } from './lib/types'
 import { useStoredState } from './lib/useStoredState'
+import { useReadingProgress } from './lib/useReadingProgress'
 
 const VIEW_TITLES: Record<View, string> = {
   home: 'Overview',
@@ -41,6 +42,7 @@ export default function App() {
   const [settings, setSettings] = useStoredState<Settings>('noor.settings', DEFAULT_SETTINGS)
   const [bookmarks, setBookmarks] = useStoredState<Bookmark[]>('noor.bookmarks', [])
   const [lastRead, setLastRead] = useStoredState<LastRead | null>('noor.lastRead', null)
+  const { state: readingProgressState, record: recordReading, start: startKhatmahPlan, complete: completeKhatmahPlan, abandon: abandonKhatmahPlan, ensureLastPosition } = useReadingProgress()
 
   const audioRef = useRef<HTMLAudioElement>(null)
   const audioSurahRef = useRef<number | null>(null)
@@ -52,6 +54,12 @@ export default function App() {
   const [duration, setDuration] = useState(0)
 
   const showToast = (message: string) => setToast(message)
+
+  useEffect(() => {
+    if (lastRead) {
+      ensureLastPosition(lastRead)
+    }
+  }, [lastRead, ensureLastPosition])
 
   useEffect(() => {
     let active = true
@@ -141,18 +149,20 @@ export default function App() {
   const handleReadProgress = useCallback(
     (surah: number, ayah: number) => {
       const meta = surahs.find((item) => item.number === surah)
+      const surahName = meta?.englishName || `Surah ${surah}`
+      recordReading({ surah, ayah, surahName })
       setLastRead((current) =>
         current?.surah === surah && current.ayah === ayah
           ? current
           : {
               surah,
               ayah,
-              surahName: meta?.englishName || `Surah ${surah}`,
+              surahName,
               timestamp: Date.now(),
             },
       )
     },
-    [surahs, setLastRead],
+    [surahs, setLastRead, recordReading],
   )
 
   const openSurah = useCallback(
@@ -162,15 +172,17 @@ export default function App() {
       setHighlightAyah(ayah ?? null)
       setSearchOpen(false)
       const meta = surahs.find((item) => item.number === number)
-      setLastRead({
+      const nextLastRead = {
         surah: number,
         ayah: ayah ?? 1,
         surahName: meta?.englishName || `Surah ${number}`,
         timestamp: Date.now(),
-      })
+      }
+      recordReading({ surah: nextLastRead.surah, ayah: nextLastRead.ayah, surahName: nextLastRead.surahName })
+      setLastRead(nextLastRead)
       window.scrollTo({ top: 0, behavior: 'auto' })
     },
-    [surahs, setLastRead],
+    [surahs, setLastRead, recordReading],
   )
 
   const navigate = (next: View) => {
@@ -294,6 +306,20 @@ export default function App() {
               onOpenSurah={(number, ayah) => openSurah(number, ayah)}
               onNavigate={navigate}
               onToast={showToast}
+              readingProgress={readingProgressState}
+              onStartKhatmah={(days) => {
+                const pos = lastRead ?? { surah: 1, ayah: 1, surahName: 'Al-Faatiha', timestamp: Date.now() }
+                startKhatmahPlan(days, pos)
+                showToast('Khatmah started')
+              }}
+              onCompleteKhatmah={() => {
+                completeKhatmahPlan()
+                showToast('Khatmah completed')
+              }}
+              onAbandonKhatmah={() => {
+                abandonKhatmahPlan()
+                showToast('Khatmah plan reset')
+              }}
             />
           )}
           {view === 'surahs' && (

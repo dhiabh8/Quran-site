@@ -779,6 +779,217 @@ button:disabled {
   text-align: center;
 }
 
+/* ---------- Reading progress / khatmah ---------- */
+.reading-progress-card {
+  margin-top: 18px;
+  padding: 24px;
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(20, 49, 39, 0.9), rgba(13, 31, 25, 0.9));
+  box-shadow: var(--shadow);
+}
+
+:root[data-theme='light'] .reading-progress-card {
+  background: linear-gradient(145deg, rgba(255,255,255,0.96), rgba(241,247,243,0.96));
+}
+
+.reading-progress-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.reading-progress-head h2 {
+  margin: 6px 0 0;
+  font-size: 24px;
+  letter-spacing: -0.7px;
+}
+
+.reading-progress-subtitle {
+  margin: 10px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.reading-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.reading-stat {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.02);
+}
+
+:root[data-theme='light'] .reading-stat { background: rgba(18,60,50,0.02); }
+
+.reading-stat-icon {
+  width: 40px;
+  height: 40px;
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.reading-stat-icon--gold { background: rgba(217,189,131,0.14); color: var(--gold); }
+.reading-stat-icon--blue { background: rgba(113,168,233,0.13); color: #7fb1e8; }
+
+.reading-stat strong {
+  display: block;
+  font-size: 22px;
+  line-height: 1.1;
+  letter-spacing: -0.6px;
+}
+
+.reading-stat span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.khatmah-panel {
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(212, 175, 102, 0.05);
+}
+
+.khatmah-panel-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.khatmah-panel-head strong { font-size: 15px; }
+.khatmah-panel-head p {
+  margin: 5px 0 0;
+  font-size: 12px;
+  color: var(--text-soft);
+  line-height: 1.6;
+}
+
+.khatmah-percent {
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.khatmah-progress-track {
+  height: 8px;
+  margin-top: 14px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.khatmah-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #56e6ab, #d4af66);
+}
+
+.khatmah-current {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.khatmah-current b { color: var(--text); }
+
+.khatmah-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.khatmah-target {
+  height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.khatmah-target--active {
+  border-color: var(--gold);
+  background: rgba(212,175,102,0.12);
+  color: var(--gold);
+}
+
+.khatmah-custom-target {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.khatmah-custom-target input {
+  width: 110px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.khatmah-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.khatmah-action-primary { margin-top: 0; }
+.khatmah-action-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.khatmah-action-secondary:hover { border-color: var(--border-strong); color: var(--text); }
+
+@media (max-width: 900px) {
+  .reading-progress-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .reading-progress-card { padding: 18px; border-radius: 18px; }
+  .reading-progress-head { flex-direction: column; align-items: stretch; }
+  .reading-progress-head h2 { font-size: 21px; }
+}
+
 /* ---------- PWA install / offline / update ---------- */
 .install-card {
   margin-top: 18px;

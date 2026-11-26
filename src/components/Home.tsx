@@ -1,7 +1,9 @@
 import { ArrowRight, BookOpen, Bookmark, CircleDot, Layers3, Play, Sparkles } from 'lucide-react'
 import type { LastRead, SurahSummary, View } from '../lib/types'
+import type { ReadingProgressState } from '../lib/readingProgress'
 import { InstallAppCard } from './InstallAppCard'
 import { PrayerTimesCard } from './PrayerTimesCard'
+import { ReadingProgressCard } from './ReadingProgressCard'
 import { SurahCard } from './SurahCard'
 
 interface HomeProps {
@@ -12,6 +14,10 @@ interface HomeProps {
   onOpenSurah: (number: number, ayah?: number) => void
   onNavigate: (view: View) => void
   onToast: (message: string) => void
+  readingProgress: ReadingProgressState
+  onStartKhatmah: (targetDays: number) => void
+  onCompleteKhatmah: () => void
+  onAbandonKhatmah: () => void
 }
 
 const FEATURED = [1, 2, 36, 55, 67, 112]
@@ -24,6 +30,10 @@ export function Home({
   onOpenSurah,
   onNavigate,
   onToast,
+  readingProgress,
+  onStartKhatmah,
+  onCompleteKhatmah,
+  onAbandonKhatmah,
 }: HomeProps) {
   const featured = FEATURED.map((n) => surahs.find((s) => s.number === n)).filter(
     (s): s is SurahSummary => Boolean(s),
@@ -79,6 +89,14 @@ export function Home({
       </section>
 
       <PrayerTimesCard />
+
+      <ReadingProgressCard
+        progress={readingProgress}
+        onStartKhatmah={onStartKhatmah}
+        onCompleteKhatmah={onCompleteKhatmah}
+        onAbandonKhatmah={onAbandonKhatmah}
+        onContinue={() => onOpenSurah(lastRead?.surah || 1, lastRead?.ayah)}
+      />
 
       <InstallAppCard onToast={onToast} />
 
