@@ -20,6 +20,7 @@ interface HomeProps {
   onCompleteKhatmah: () => void
   onAbandonKhatmah: () => void
   feelings?: ReactNode
+  khatmah?: ReactNode
 }
 
 const FEATURED = [1, 2, 36, 55, 67, 112]
@@ -37,6 +38,7 @@ export function Home({
   onCompleteKhatmah,
   onAbandonKhatmah,
   feelings,
+  khatmah,
 }: HomeProps) {
   const featured = FEATURED.map((n) => surahs.find((s) => s.number === n)).filter(
     (s): s is SurahSummary => Boolean(s),
@@ -92,6 +94,8 @@ export function Home({
       </section>
 
       {feelings}
+
+      {khatmah}
 
       <PrayerTimesCard />
 

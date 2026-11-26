@@ -1,4 +1,4 @@
-import { Bookmark, BookOpen, CircleDot, Compass, Home, Layers3, X } from 'lucide-react'
+import { Bookmark, BookOpen, CircleDot, Compass, Home, Layers3, Users, X } from 'lucide-react'
 import type { LastRead, View } from '../lib/types'
 
 interface SidebarProps {
@@ -16,6 +16,7 @@ const NAV_ITEMS: Array<{ id: View; label: string; icon: typeof Home }> = [
   { id: 'juz', label: 'Juz Index', icon: Layers3 },
   { id: 'tasbih', label: 'Tasbih · تسبيح', icon: CircleDot },
   { id: 'bookmarks', label: 'Bookmarks', icon: Bookmark },
+  { id: 'khatmahs', label: 'Shared Khatmah', icon: Users },
 ]
 
 export function Sidebar({ view, onNavigate, lastRead, onContinue, open, onClose }: SidebarProps) {
@@ -43,7 +44,8 @@ export function Sidebar({ view, onNavigate, lastRead, onContinue, open, onClose 
             const active =
               view === item.id ||
               (view === 'reader' && item.id === 'surahs') ||
-              (view === 'feelings' && item.id === 'home')
+              (view === 'feelings' && item.id === 'home') ||
+              (view === 'khatmah' && item.id === 'khatmahs')
             return (
               <button
                 key={item.id}

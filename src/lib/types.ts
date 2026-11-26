@@ -89,7 +89,16 @@ export interface FeelingPassageContent {
   noteAr: string
 }
 
-export type View = 'home' | 'surahs' | 'juz' | 'tasbih' | 'bookmarks' | 'reader' | 'feelings'
+export type View =
+  | 'home'
+  | 'surahs'
+  | 'juz'
+  | 'tasbih'
+  | 'bookmarks'
+  | 'reader'
+  | 'feelings'
+  | 'khatmahs'
+  | 'khatmah'
 
 /** A verified Qur'anic reference: surah number (1-114) and ayah within it. */
 export interface VerseRef {

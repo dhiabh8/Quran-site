@@ -18,7 +18,7 @@ export function Topbar({ view, title, onBack, onSearch, onSettings, onMenu, back
         <button className="icon-button mobile-menu" onClick={onMenu} aria-label="Open menu">
           <Menu size={20} />
         </button>
-        {view === 'reader' ? (
+        {view === 'reader' || view === 'khatmah' ? (
           <button className="back-button" onClick={onBack}>
             <ChevronLeft size={18} />
             <span>{backLabel ?? 'All Surahs'}</span>

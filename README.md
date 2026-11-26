@@ -1,32 +1,56 @@
-# React + TypeScript + Vite
+# NOOR — Quran Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A calm, RTL-first Quran reading experience built with React 19, TypeScript and Vite. Read and listen to the Quran, explore tafsir, track personal reading, use the tasbih counter, reflect through “Quran by Feelings”, and complete a shared Khatmah with family and friends.
 
-Currently, two official plugins are available:
+## Getting started
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Production build:
+
+```bash
+npm run build
+npm run preview
+```
+
+Lint:
+
+```bash
+npm run lint
+```
+
+## Features
+
+- Full Quran reader with Uthmani Arabic, Saheeh International translation, transliteration and verified tafsir sources
+- Audio player with multiple reciters and per-ayah playback
+- Surah and Juz browsing, search, bookmarks and reading progress
+- Tasbih counter and prayer times
+- **Quran by Feelings** — curated, verified passages for different emotional states
+- **Shared Khatmah** — groups with invitation links, anonymous participation, Juz distribution and live progress
+
+## Shared Khatmah setup
+
+Shared Khatmah uses Supabase (Postgres, Anonymous Auth, Realtime, RLS). It is inactive until you provide frontend environment variables and apply the SQL migration. No credentials are included in this repository.
+
+See **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)** for complete instructions and **[supabase/migrations/0001_shared_khatmah.sql](./supabase/migrations/0001_shared_khatmah.sql)** for the schema and policies.
+
+Environment variables (copy `.env.example` to `.env.local`):
+
+```env
+VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_REPLACE_ME
+```
+
+Add the same variables to your Cloudflare Pages project settings. The existing `public/_redirects` file enables deep links such as `/khatmah/<invite-code>`.
+
+## Deployment
+
+Hosting remains Cloudflare Pages:
+
+- Build command: `npm run build`
+- Output directory: `dist`
+
+The service worker in `public/sw.js` caches the app shell and runtime assets; remote Quran, tafsir and Supabase data are deliberately not cached as application-owned content.

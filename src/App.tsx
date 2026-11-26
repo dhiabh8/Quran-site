@@ -5,6 +5,9 @@ import { FeelingResults } from './components/FeelingResults'
 import { FeelingsHome } from './components/FeelingsHome'
 import { Home } from './components/Home'
 import { Juz } from './components/Juz'
+import { KhatmahHome } from './components/khatmah/KhatmahHome'
+import { KhatmahList } from './components/khatmah/KhatmahList'
+import { KhatmahPage } from './components/khatmah/KhatmahPage'
 import { Reader } from './components/Reader'
 import { SearchOverlay } from './components/SearchOverlay'
 import { DEFAULT_SETTINGS, SettingsDrawer } from './components/SettingsDrawer'
@@ -14,6 +17,8 @@ import { Tasbih } from './components/Tasbih'
 import { Topbar } from './components/Topbar'
 import { fetchAudioForAyah, fetchAudioForSurah, fetchSurahs } from './lib/api'
 import { applyServiceWorkerUpdate } from './lib/pwa'
+import { buildRoute, parseRoute, pushRoute } from './lib/router'
+import { isSupabaseConfigured } from './lib/supabase'
 import type {
   Bookmark,
   FeelingId,
@@ -36,13 +41,18 @@ const VIEW_TITLES: Record<View, string> = {
   bookmarks: 'Bookmarks',
   reader: '',
   feelings: 'How are you feeling?',
+  khatmahs: 'Shared Khatmah',
+  khatmah: 'Shared Khatmah',
 }
 
+const initialRoute = parseRoute(window.location.pathname)
+
 export default function App() {
-  const [view, setView] = useState<View>('home')
+  const [view, setView] = useState<View>(initialRoute.view)
+  const [khatmahRef, setKhatmahRef] = useState(initialRoute.khatmahRef ?? '')
   const [surahs, setSurahs] = useState<SurahSummary[]>([])
   const [surahsLoading, setSurahsLoading] = useState(true)
-  const [surahNumber, setSurahNumber] = useState(1)
+  const [surahNumber, setSurahNumber] = useState(initialRoute.surah ?? 1)
   const [highlightAyah, setHighlightAyah] = useState<number | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -125,6 +135,17 @@ export default function App() {
   }, [toast])
 
   useEffect(() => {
+    const handlePopState = () => {
+      const route = parseRoute(window.location.pathname)
+      setView(route.view)
+      if (route.khatmahRef) setKhatmahRef(route.khatmahRef)
+      if (route.surah) setSurahNumber(route.surah)
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [])
+
+  useEffect(() => {
     const handleKey = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
@@ -187,6 +208,7 @@ export default function App() {
     (number: number, ayah?: number) => {
       setSurahNumber(number)
       setView('reader')
+      pushRoute(buildRoute('reader', { surah: number }))
       setHighlightAyah(ayah ?? null)
       setSearchOpen(false)
       const meta = surahs.find((item) => item.number === number)
@@ -203,23 +225,29 @@ export default function App() {
     [surahs, setLastRead, recordReading],
   )
 
-  const navigate = (next: View) => {
+  const navigate = (next: View, options?: { khatmahRef?: string; surah?: number }) => {
     setView(next)
+    if (options?.khatmahRef !== undefined) setKhatmahRef(options.khatmahRef)
+    if (options?.surah !== undefined) setSurahNumber(options.surah)
+    pushRoute(buildRoute(next, options))
     window.scrollTo({ top: 0, behavior: 'auto' })
   }
+
+  const openKhatmah = (inviteRef: string) => navigate('khatmah', { khatmahRef: inviteRef })
 
   const openFeeling = useCallback(
     (id: FeelingId) => {
       setFeelingId(id)
       setRecentFeelings((current) => [id, ...current.filter((item) => item !== id)].slice(0, 6))
       setView('feelings')
+      pushRoute(buildRoute('feelings'))
       window.scrollTo({ top: 0, behavior: 'auto' })
     },
     [setRecentFeelings],
   )
 
   const chooseAnotherFeeling = () => {
-    setView('home')
+    navigate('home')
     window.setTimeout(() => {
       document.getElementById('feelings-heading')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }, 60)
@@ -387,8 +415,8 @@ export default function App() {
         <Topbar
           view={view}
           title={VIEW_TITLES[view]}
-          onBack={() => navigate(view === 'feelings' ? 'home' : 'surahs')}
-          backLabel={view === 'feelings' ? 'Home' : undefined}
+          onBack={() => navigate(view === 'feelings' ? 'home' : view === 'khatmah' ? 'khatmahs' : 'surahs')}
+          backLabel={view === 'feelings' ? 'Home' : view === 'khatmah' ? 'Shared Khatmah' : undefined}
           onSearch={() => setSearchOpen(true)}
           onSettings={() => setSettingsOpen(true)}
           onMenu={() => setSidebarOpen(true)}
@@ -424,6 +452,7 @@ export default function App() {
                 showToast('Khatmah plan reset')
               }}
               feelings={<FeelingsHome onSelect={openFeeling} recent={recentFeelings} />}
+              khatmah={<KhatmahHome configured={isSupabaseConfigured} onOpen={() => navigate('khatmahs')} />}
             />
           )}
           {view === 'surahs' && (
@@ -446,6 +475,19 @@ export default function App() {
               bookmarks={bookmarks}
               onOpen={(surah, ayah) => openSurah(surah, ayah)}
               onRemove={(key) => setBookmarks((current) => current.filter((item) => item.key !== key))}
+            />
+          )}
+          {view === 'khatmahs' && (
+            <KhatmahList configured={isSupabaseConfigured} onOpen={openKhatmah} onToast={showToast} />
+          )}
+          {view === 'khatmah' && khatmahRef && (
+            <KhatmahPage
+              inviteRef={khatmahRef}
+              configured={isSupabaseConfigured}
+              onBack={() => navigate('khatmahs')}
+              onHome={() => navigate('home')}
+              onOpenSurah={(surah, ayah) => openSurah(surah, ayah)}
+              onToast={showToast}
             />
           )}
           {view === 'feelings' && feelingId && (
